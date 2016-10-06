@@ -1,3 +1,5 @@
+
+
 apply plugin: 'com.android.application'
 
 android {
@@ -28,3 +30,14 @@ dependencies {
     compile 'com.android.support:design:23.4.0'
     testCompile 'junit:junit:4.12'
 }
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "io.realm:realm-gradle-plugin:0.88.2"
+    }
+}
+
+apply plugin: 'realm-android'
