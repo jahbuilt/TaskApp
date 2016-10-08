@@ -8,9 +8,14 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+
+import android.widget.SearchView;
+import android.widget.SearchView.OnQueryTextListener;
+
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -20,7 +25,7 @@ import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import io.realm.Sort;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnQueryTextListener {
 
     public final static String EXTRA_TASK = "jp.techacademy.atsushi.ninomiya.taskapp.TASK";
 
@@ -58,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
         // ListViewの設定
         mTaskAdapter = new TaskAdapter(MainActivity.this);
         mListView = (ListView) findViewById(R.id.listView1);
+        mListView.setTextFilterEnabled(false);
+
 
         // ListViewをタップしたときの処理
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -122,6 +129,20 @@ public class MainActivity extends AppCompatActivity {
 
         reloadListView();
 
+        SearchView search = (SearchView) findViewById(R.id.searchView1);
+
+        // SearchViewの初期表示状態を設定
+        search.setIconifiedByDefault(false);
+
+        // SearchViewにOnQueryChangeListenerを設定
+        search.setOnQueryTextListener(this);
+
+        // SearchViewのSubmitボタンを使用不可にする
+        search.setSubmitButtonEnabled(true);
+
+        // SearchViewに何も入力していない時のテキストを設定
+        search.setQueryHint("検索文字を入力して下さい。");
+
     }
 
     private void reloadListView() {
@@ -144,6 +165,7 @@ public class MainActivity extends AppCompatActivity {
         mTaskAdapter.setTaskArrayList(taskArrayList);
         mListView.setAdapter(mTaskAdapter);
         mTaskAdapter.notifyDataSetChanged();
+
     }
 
     @Override
@@ -157,11 +179,29 @@ public class MainActivity extends AppCompatActivity {
         Task task = new Task();
         task.setTitle("作業");
         task.setContents("プログラムを書いてPUSHする");
-        task.setCategory("AndroidApp開発");
+        task.setCategory("プログラムを書いてPUSHする");
         task.setDate(new Date());
         task.setId(0);
         mRealm.beginTransaction();
         mRealm.copyToRealmOrUpdate(task);
         mRealm.commitTransaction();
     }
+
+    // SearchViewにテキストを入力する度に呼ばれるイベント
+    @Override
+    public boolean onQueryTextChange(String queryText) {
+        if (TextUtils.isEmpty(queryText)) {
+            mListView.clearTextFilter();
+        } else {
+            mListView.setFilterText(queryText.toString());
+        }
+        return true;
+    }
+
+    // SearchViewのSubmitButtonを押下した時に呼ばれるイベント
+    @Override
+    public boolean onQueryTextSubmit(String queryText) {
+        return false;
+    }
+
 }
