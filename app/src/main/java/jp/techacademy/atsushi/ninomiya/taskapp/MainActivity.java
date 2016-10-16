@@ -191,10 +191,12 @@ public class MainActivity extends AppCompatActivity implements OnQueryTextListen
     @Override
     public boolean onQueryTextChange(String queryText) {
         if (TextUtils.isEmpty(queryText)) {
-            mListView.clearTextFilter();
+            mTaskRealmResults = mRealm.where(Task.class).findAll();
         } else {
-            mListView.setFilterText(queryText.toString());
+            mTaskRealmResults = mRealm.where(Task.class).contains("category", queryText).findAll();
         }
+        mTaskRealmResults.sort("date", Sort.DESCENDING);
+        reloadListView();
         return true;
     }
 
